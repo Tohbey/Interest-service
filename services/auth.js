@@ -162,15 +162,8 @@ class AuthService {
     static recover(body) {
         return new Promise(async (resolve, reject) => {
             try {
-                const User = await User.findOne({ 
-                    $or: [
-                        {
-                            email: body.emailPhoneNumber
-                        },
-                        {
-                            phoneNumber: body.emailPhoneNumber
-                        }
-                    ]
+                const User = await User.findOne({
+                    phoneNumber: body.phoneNumber
                 });
 
                 const otp = GenerateOTP(5)

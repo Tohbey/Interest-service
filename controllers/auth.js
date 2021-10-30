@@ -89,7 +89,7 @@ exports.passwordChange = async (req, res, next) => {
 */
 exports.recover = async (req, res, next) => {
     try {
-        const {updateUser} =  await AuthService.recover(req.body.emailPhoneNumber);
+        const {updateUser} =  await AuthService.recover(req.body.phoneNumber);
         
         return JsonResponse(res, 200, MSG_TYPES.SENT, updateUser)
     } catch (error) {
