@@ -11,4 +11,5 @@ module.exports = function(){
        useUnifiedTopology: true,
     })
     .then(() => winston.info('-------Successfully connected to MongoDB-------'))
+    .catch((err) => console.log(err))
 }

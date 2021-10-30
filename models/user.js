@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 
 require('dotenv').config();
 const jwtSecret = process.env.JWT_SECRET
@@ -71,11 +69,9 @@ const userSchema = new mongoose.Schema(
             },
             resetPasswordToken: {
                 type: String,
-                required: false
             },
             resetPasswordExpires: {
                 type: Date,
-                required: false
             }
         }
     },

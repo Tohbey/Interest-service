@@ -162,29 +162,25 @@ class AuthService {
     static recover(body) {
         return new Promise(async (resolve, reject) => {
             try {
-                const User = await User.findOne({
+                const user = await User.findOne({
                     phoneNumber: body.phoneNumber
                 });
+                if(!user){
+                    return reject({ statusCode: 400, msg: MSG_TYPES.NOT_FOUND})
+                }
 
                 const otp = GenerateOTP(5)
                 const expiredDate = moment().add(20, "minutes");
-                let message = "Your verification code is "+otp+ "Please DONT FORGET AGAIN";
+                let message = "Your OTP code is "+otp+ " Please DONT FORGET YOUR PASSWORD AGAIN";
                 const passwordToken = {
                     createdAt: new Date(),
-                    token: otp,
-                    expiredDate
+                    resetPasswordToken: otp,
+                    resetPasswordExpires: expiredDate
                 }
 
-                const updateUser = await User.updateOne(
+                await User.updateOne(
                     { 
-                        $or: [
-                            {
-                                email: body.emailPhoneNumber
-                            },
-                            {
-                                phoneNumber: body.emailPhoneNumber
-                            }
-                        ]
+                        phoneNumber: body.phoneNumber
                     },
                     {
                         $set: {
@@ -193,9 +189,9 @@ class AuthService {
                     }
                 )
 
-                await sendOTPByTwilio(message, newUser.phoneNumber);
+                await sendOTPByTwilio(message, user.phoneNumber);
 
-                resolve({ updateUser })
+                resolve({ user })
             } catch (error) {
                 return reject({ statusCode: 500, msg: MSG_TYPES.SERVER_ERROR, error });
             }
@@ -203,11 +199,10 @@ class AuthService {
     }
 
     static resetPassword(user, password) {
-        return new Promse(async (resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             try {
                 user.password = password;
-                user.resetPasswordToken = undefined;
-                user.resetPasswordExpires = undefined;
+                user.passwordRetrive = null;
 
                 user.save();
 

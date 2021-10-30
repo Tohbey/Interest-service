@@ -62,6 +62,7 @@ function validatePasswordChange(body){
 
 function validateResetPassword(body){
     const schema = Joi.object({
+        phoneNumber: Joi.string().required(),
         token: Joi.string().required(),
         password: passwordComplexity(complexityOption).required(),
     })

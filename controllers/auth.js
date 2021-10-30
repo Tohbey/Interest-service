@@ -3,6 +3,7 @@ const { MSG_TYPES } = require('../constant/types');
 const { validateVerifyUser, validateLogin, validateResendOTP, validateResetPassword, validatePasswordChange } = require('../request/user');
 const { JsonResponse } = require('../lib/apiResponse');
 const UserService = require('../services/user');
+const bcrypt = require('bcrypt');
 
 /** 
  * Login
@@ -89,10 +90,11 @@ exports.passwordChange = async (req, res, next) => {
 */
 exports.recover = async (req, res, next) => {
     try {
-        const {updateUser} =  await AuthService.recover(req.body.phoneNumber);
+        const {updateUser} =  await AuthService.recover(req.body);
         
         return JsonResponse(res, 200, MSG_TYPES.SENT, updateUser)
     } catch (error) {
+        console.log({error})
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }
@@ -109,8 +111,8 @@ exports.resetPassword = async(req, res, next) => {
         if(error) return JsonResponse(res, 400, error.details[0].message)
 
         let filter = {
+            phoneNumber: req.body.phoneNumber,
             "passwordRetrive.resetPasswordToken":req.body.token,
-            "passwordRetrive.resetPasswordExpires": {$get: new Date()}
         }
         const user = await UserService.getUser(filter);
         if (!user) {
@@ -124,6 +126,7 @@ exports.resetPassword = async(req, res, next) => {
 
         JsonResponse(res, 200, MSG_TYPES.UPDATED);
     } catch (error) {
+        console.log({error})
         JsonResponse(res, error.statusCode, error.msg)
         next(error)
     }
